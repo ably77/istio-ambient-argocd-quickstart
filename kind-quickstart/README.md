@@ -6,7 +6,10 @@
 ## Introduction
 How long does it take to configure your first local development environment, sidecarless Service Mesh, and GitOps workflow?
 
-How about 15 minutes? Give us that much time and we’ll give you an ephemeral testbed to explore the benefits of the new architecture mode in Istio, deploy a few applications, and validate zero-trust with zero-effort! We’ll host all of this on a local kind cluster to keep the setup standalone and as simple as possible.
+How about 15 minutes? Give us that much time and we’ll give you an ephemeral testbed to explore the benefits of the new architecture mode in Istio, deploy a few applications, and validate zero-trust with minimal effort! We’ll host all of this on a local kind cluster to keep the setup standalone and as simple as possible.
+
+## Purpose of this Tutorial
+The main goal of this tutorial is to showcase how Istio Ambient architecture components can be integrated into a GitOps workflow, with Argo CD being our tool of choice. We'll guide you through the installation of Argo CD, Gloo Platform, Istio Ambient, and then validate that service-to-service communication is automatically secured using mTLS.
 
 Would you prefer to perform this exercise on a public cloud rather than a local KinD cluster? Then check out these alternative versions of this post:
 
@@ -18,7 +21,7 @@ If you have questions, please reach out on the Solo Slack channel.
 Ready? Set? Go!
 
 ## Prerequisites
-For this exercise, we’re going to do all the work on your local workstation. All you’ll need to get started is a Docker-compatible environment such as Docker Desktop, plus the CLI utilities kubectl, kind, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
+For this exercise, we’re going to do all the work on your local workstation. All you’ll need to get started is a Docker-compatible environment such as Docker Desktop, plus the CLI utilities kubectl, kind. Make sure these are all available to you before jumping into the next section.
 
 ### Install kind
 
@@ -306,6 +309,12 @@ spec:
 EOF
 ```
 
+You can check to see that the applications have been deployed
+```bash
+kubectl get pods -n client && \
+kubectl get pods -n httpbin
+```
+
 ## exec into sleep client and curl httpbin /get endpoint to verify mTLS
 ```bash
 kubectl exec -it deploy/sleep -n client -c sleep sh
@@ -313,9 +322,47 @@ kubectl exec -it deploy/sleep -n client -c sleep sh
 curl httpbin.httpbin.svc.cluster.local:8000/get
 ```
 
-## remove httpbin
+## Follow ztunnel logs to see mTLS traffic
 ```bash
-kubectl delete -k httpbin/ambient
+kubectl logs -n istio-system ds/ztunnel -f
 ```
 
+You should see log output similar to below:
+```
+2024-05-07T04:11:01.169923Z     info    access  connection complete     src.addr=10.244.0.14:42774 src.workload="sleep-9454cc476-hxhx5" src.namespace="client" src.identity="spiffe://cluster.local/ns/client/sa/sleep" dst.addr=10.244.0.15:15008 dst.hbone_addr="10.244.0.15:80" dst.service="httpbin.httpbin.svc.cluster.local" dst.workload="httpbin-698cc5f69-w2rzc" dst.namespace="httpbin" dst.identity="spiffe://cluster.local/ns/httpbin/sa/httpbin" direction="outbound" bytes_sent=104 bytes_recv=467 duration="35ms"
+```
 
+## Cleanup
+
+To remove all the Argo CD Applications we configured for this lab
+```bash
+kubectl delete applications -n argocd httpbin
+kubectl delete applications -n argocd client
+kubectl delete applications -n argocd istio-ztunnel
+kubectl delete applications -n argocd istiod
+kubectl delete applications -n argocd istio-cni
+kubectl delete applications -n argocd istio-base
+```
+
+If you’d like to cleanup the work you’ve done, simply delete the kind cluster where you’ve been working.
+```
+kind delete cluster
+```
+
+## Learn More
+In this blog post, we explored how you can get started with Istio Ambient and Argo CD on your own workstation. We walked step-by-step through the process of standing up a kind cluster, configuring the new Istio Ambient architecture, installing a couple applications, and then validating zero trust for service-to-service communication without injecting sidecars! All of the code used in this guide is available on github.
+
+A Gloo Mesh Core subscription offers even more value to users who require:
+
+########### change this ###########
+
+Istio Ambient Support;
+Istio lifecycle management tooling;
+An Insights dashboard;
+OTEL Integration
+
+For more information, check out the following resources.
+Explore the documentation for Istio Ambient
+Request a live demo or trial for Gloo Mesh Core
+See video content on the solo.io YouTube channel.
+Questions? Join the Solo.io and Istio Slack communities!

@@ -18,17 +18,16 @@ If you have questions, please reach out on the Solo Slack channel.
 Ready? Set? Go!
 
 ## Prerequisites
-For this exercise, we’re going to do all the work on your local workstation. All you’ll need to get started is a Docker-compatible environment such as Docker Desktop, plus the CLI utilities kubectl, kind, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
-
-# Configure Docker network
-```bash
-network=k3d-cluster-network
-docker network create "$network" > /dev/null 2>&1 || true
-```
+For this exercise, we’re going to do all the work on your local workstation. All you’ll need to get started is a Docker-compatible environment such as Docker Desktop, plus the CLI utilities kubectl, k3d, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
 
 ### Install k3d
 
 To install k3d simply run the following
+```bash
+k3d cluster create
+```
+
+(maybe needed)
 ```bash
 k3d cluster create --wait --config - <<EOF
 apiVersion: k3d.io/v1alpha5
@@ -78,8 +77,8 @@ kubectl config get-contexts
 The output should look similar to below
 ```bash
 % kubectl config get-contexts
-CURRENT   NAME               CLUSTER            AUTHINFO                 NAMESPACE
-*         k3d-ambient-demo   k3d-ambient-demo   admin@k3d-ambient-demo  
+CURRENT   NAME              CLUSTER           AUTHINFO                NAMESPACE
+*         k3d-k3s-default   k3d-k3s-default   admin@k3d-k3s-default   
 ```
 
 ### Installing Argo CD	
@@ -215,33 +214,6 @@ spec:
 EOF
 ```
 
-Deploy the `ztunnel` helm chart using Argo CD
-
-```bash
-kubectl apply -f- <<EOF
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: istio-ztunnel
-  namespace: argocd
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-spec:
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: istio-system
-  project: default
-  source:
-    chart: ztunnel
-    repoURL: https://istio-release.storage.googleapis.com/charts
-    targetRevision: ${ISTIO_VERSION}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-EOF
-```
-
 Deploy the `istiod` helm chart using Argo CD
 
 ```bash
@@ -272,19 +244,164 @@ spec:
 EOF
 ```
 
+Deploy the `ztunnel` helm chart using Argo CD
+```bash
+kubectl apply -f- <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: istio-ztunnel
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: istio-system
+  project: default
+  source:
+    chart: ztunnel
+    repoURL: https://istio-release.storage.googleapis.com/charts
+    targetRevision: ${ISTIO_VERSION}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
+```
 
 You can check to see that Istio Ambient architecture components have been deployed
 ```bash
 kubectl get pods -n istio-system && \
-kubectl get pods -n kube-system
+kubectl get pods -n kube-system | grep istio-cni
 ```
 
 Output should look similar to below:
 ```bash
-NAME                             READY   STATUS    RESTARTS   AGE
-istiod-1-20-6-86499c5945-bbsfl   1/1     Running   0          38m
-NAME                                           READY   STATUS    RESTARTS   AGE
-istio-ingressgateway-1-20-6-6575484979-5fbn7   1/1     Running   0          36m
+NAME                      READY   STATUS    RESTARTS   AGE
+istiod-759bc56fb5-kn4bp   1/1     Running   0          81s
+ztunnel-w879j             1/1     Running   0          51s
+istio-cni-node-gzpvd      1/1     Running   0          2m50s
 ```
 
+# Configure an App
 
+First the client app
+```bash
+kubectl apply -f - <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: client
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ably77/istio-ambient-argocd-quickstart/
+    path: workloads/client/ambient
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m0s
+EOF
+```
+
+Next we will deploy httpbin
+```bash
+kubectl apply -f - <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: httpbin
+  namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ably77/istio-ambient-argocd-quickstart/
+    path: workloads/httpbin/ambient
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m0s
+EOF
+```
+
+You can check to see that the applications have been deployed
+```bash
+kubectl get pods -n client && \
+kubectl get pods -n httpbin
+```
+
+## exec into sleep client and curl httpbin /get endpoint to verify mTLS
+```bash
+kubectl exec -it deploy/sleep -n client -c sleep sh
+
+curl httpbin.httpbin.svc.cluster.local:8000/get
+```
+
+## Follow ztunnel logs to see mTLS traffic
+```bash
+kubectl logs -n istio-system ds/ztunnel -f
+```
+
+You should see log output similar to below:
+```
+2024-05-07T04:11:01.169923Z     info    access  connection complete     src.addr=10.244.0.14:42774 src.workload="sleep-9454cc476-hxhx5" src.namespace="client" src.identity="spiffe://cluster.local/ns/client/sa/sleep" dst.addr=10.244.0.15:15008 dst.hbone_addr="10.244.0.15:80" dst.service="httpbin.httpbin.svc.cluster.local" dst.workload="httpbin-698cc5f69-w2rzc" dst.namespace="httpbin" dst.identity="spiffe://cluster.local/ns/httpbin/sa/httpbin" direction="outbound" bytes_sent=104 bytes_recv=467 duration="35ms"
+```
+
+## Cleanup
+
+To remove all the Argo CD Applications we configured for this lab
+```bash
+kubectl delete applications -n argocd httpbin
+kubectl delete applications -n argocd client
+kubectl delete applications -n argocd istio-ztunnel
+kubectl delete applications -n argocd istiod
+kubectl delete applications -n argocd istio-cni
+kubectl delete applications -n argocd istio-base
+```
+
+If you’d like to cleanup the work you’ve done, simply delete the k3d cluster where you’ve been working.
+```bash
+k3d cluster delete
+```
+
+## Learn More
+In this blog post, we explored how you can get started with Istio Ambient and Argo CD on your own workstation. We walked step-by-step through the process of standing up a k3d cluster, configuring the new Istio Ambient architecture, installing a couple applications, and then validating zero trust for service-to-service communication without injecting sidecars! All of the code used in this guide is available on github.
+
+A Gloo Mesh Core subscription offers even more value to users who require:
+
+########### change this ###########
+
+Istio Ambient Support;
+Istio lifecycle management tooling;
+An Insights dashboard;
+OTEL Integration
+
+For more information, check out the following resources.
+Explore the documentation for Istio Ambient
+Request a live demo or trial for Gloo Mesh Core
+See video content on the solo.io YouTube channel.
+Questions? Join the Solo.io and Istio Slack communities!
