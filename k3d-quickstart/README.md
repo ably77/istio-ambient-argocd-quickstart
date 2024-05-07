@@ -27,48 +27,6 @@ To install k3d simply run the following
 k3d cluster create
 ```
 
-(maybe needed)
-```bash
-k3d cluster create --wait --config - <<EOF
-apiVersion: k3d.io/v1alpha5
-kind: Simple
-metadata:
-  name: ambient-demo
-image: rancher/k3s:v1.28.7-k3s1
-network: k3d-cluster-network
-ports:
-  - port: 8090:8090
-    nodeFilters:
-      - loadbalancer
-  - port: 80:80
-    nodeFilters:
-      - loadbalancer
-  - port: 443:443
-    nodeFilters:
-      - loadbalancer
-options:
-  k3d:
-    wait: true
-    timeout: "60s"
-    disableLoadbalancer: false
-  k3s:
-    extraArgs:
-      - arg: --disable=traefik
-        nodeFilters:
-          - server:*
-    nodeLabels:
-      - label: topology.kubernetes.io/region=us-west
-        nodeFilters:
-          - server:*
-      - label: topology.kubernetes.io/zone=us-west-1a
-        nodeFilters:
-          - server:*
-  kubeconfig:
-    updateDefaultKubeconfig: true
-    switchCurrentContext: true
-EOF
-```
-
 Verify that the cluster has been created
 ```bash
 kubectl config get-contexts
