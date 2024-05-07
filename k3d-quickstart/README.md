@@ -205,6 +205,12 @@ spec:
     automated:
       prune: true
       selfHeal: true
+  ignoreDifferences:     
+  - group: admissionregistration.k8s.io                                                              
+    kind: ValidatingWebhookConfiguration
+    jsonPointers:                                                                                    
+    - /webhooks/0/clientConfig/caBundle
+    - /webhooks/0/failurePolicy
 EOF
 ```
 
