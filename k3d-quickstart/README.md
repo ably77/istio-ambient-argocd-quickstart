@@ -143,7 +143,6 @@ spec:
   - group: admissionregistration.k8s.io                                                              
     kind: ValidatingWebhookConfiguration
     jsonPointers:                                                                                    
-    - /webhooks/0/clientConfig/caBundle
     - /webhooks/0/failurePolicy
 EOF
 ```
@@ -209,7 +208,6 @@ spec:
   - group: admissionregistration.k8s.io                                                              
     kind: ValidatingWebhookConfiguration
     jsonPointers:                                                                                    
-    - /webhooks/0/clientConfig/caBundle
     - /webhooks/0/failurePolicy
 EOF
 ```
