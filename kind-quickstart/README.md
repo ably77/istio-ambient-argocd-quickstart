@@ -380,13 +380,15 @@ In this blog post, we explored how you can get started with Istio Ambient and Ar
 
 Istio Ambient is completely open source and free to use, however a Gloo Mesh Core subscription offers even more value to users who require:
 
-Full Support with 24x7 Enterprise SLAs;
-Long term N-4 support;
-Hardened images;
-Architectural guidance and production readiness review;
-Istio lifecycle management tooling;
-Ops dashboard for management, monitoring, and insights;
-Telemetry integration using OTEL
+- Full Support with 24x7 Enterprise SLAs;
+- Long term N-4 support;
+- Hardened images;
+- Architectural guidance and production readiness review;
+- Istio lifecycle management tooling;
+- Ops dashboard for management, monitoring, and insights;
+- Telemetry integration using OTEL
+
+![gloo-mesh-core-management-plane](../.images/Gloo-Mesh-Core-Management-Plane.png)
 
 For more information, check out the following resources.
 Explore the documentation for Istio Ambient
