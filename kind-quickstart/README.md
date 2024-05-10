@@ -319,10 +319,26 @@ spec:
 EOF
 ```
 
+Note that in order to enable ztunnel interception, all that is required is the `istio.io/dataplane-mode: ambient` label on the workload namespace. The Argo application is already configured with this label, you can verify with the following command
+```bash
+kubectl get namespace client -oyaml
+kubectl get namespace httpbin -oyaml
+```
+
 You can check to see that the applications have been deployed
 ```bash
 kubectl get pods -n client && \
 kubectl get pods -n httpbin
+```
+
+Notice that there are no sidecars have been configured for our apps, so no restarts required!
+```bash
+% kubectl get pods -n client && \
+kubectl get pods -n httpbin
+NAME                    READY   STATUS    RESTARTS   AGE
+sleep-9454cc476-fd8vw   1/1     Running   0          15s
+NAME                      READY   STATUS    RESTARTS   AGE
+httpbin-698cc5f69-h4v7p   1/1     Running   0          9s
 ```
 
 ## exec into sleep client and curl httpbin /get endpoint to verify mTLS
