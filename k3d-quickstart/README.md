@@ -389,8 +389,8 @@ Istio Ambient is completely open source and free to use, however a Gloo Mesh Cor
 
 ![gloo-mesh-core-management-plane](../.images/Gloo-Mesh-Core-Management-Plane.png)
 
-For more information, check out the following resources.
-Explore the documentation for Istio Ambient
-Request a live demo or trial for Gloo Mesh Core
-See video content on the solo.io YouTube channel.
-Questions? Join the Solo.io and Istio Slack communities!
+For more information, check out the following resources
+- Explore the documentation for Istio Ambient
+- Request a live demo or trial for Gloo Mesh Core
+- See video content on the solo.io YouTube channel.
+- Questions? Join the Solo.io and Istio Slack communities!
