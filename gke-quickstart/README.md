@@ -24,6 +24,11 @@ For this exercise, we’re going to do all the work on a GKE cluster. All you’
 
 ### Install GKE
 
+Authenticate with Google Cloud using the gcloud-cli
+```bash
+gcloud auth login
+```
+
 Set the following variables for cluster name, zone, machine type, number of nodes, k8s version, and the target GKE project
 ```
 GKE_CLUSTER_NAME="gke-ambient-quickstart"
