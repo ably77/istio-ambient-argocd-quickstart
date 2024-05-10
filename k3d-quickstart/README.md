@@ -375,14 +375,15 @@ k3d cluster delete
 ## Learn More
 In this blog post, we explored how you can get started with Istio Ambient and Argo CD on your own workstation. We walked step-by-step through the process of standing up a k3d cluster, configuring the new Istio Ambient architecture, installing a couple applications, and then validating zero trust for service-to-service communication without injecting sidecars! All of the code used in this guide is available on github.
 
-A Gloo Mesh Core subscription offers even more value to users who require:
+Istio Ambient is completely open source and free to use, however a Gloo Mesh Core subscription offers even more value to users who require:
 
-########### change this ###########
-
-Istio Ambient Support;
+Full Support with 24x7 Enterprise SLAs;
+Long term N-4 support;
+Hardened images;
+Architectural guidance and production readiness review;
 Istio lifecycle management tooling;
-An Insights dashboard;
-OTEL Integration
+Ops dashboard for management, monitoring, and insights;
+Telemetry integration using OTEL
 
 For more information, check out the following resources.
 Explore the documentation for Istio Ambient
