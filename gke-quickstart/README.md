@@ -20,13 +20,13 @@ If you have questions, please reach out on the Solo Slack channel.
 Ready? Set? Go!
 
 ## Prerequisites
-For this exercise, we’re going to do all the work on a GKE cluster. All you’ll need to get started is CLI utilities kubectl, gcloud-cli, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
+For this exercise, we’re going to do all the work on a GKE cluster. All you’ll need to get started is CLI utilities kubectl, gcloud-cli, and curl. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
 
 ### Install GKE
 
 Set the following variables for cluster name, zone, machine type, number of nodes, k8s version, and the target GKE project
 ```
-GKE_CLUSTER_NAME="gke-quickstart"
+GKE_CLUSTER_NAME="gke-ambient-quickstart"
 GKE_CLUSTER_ZONE="us-west4-b"
 MAIN_MACHINE_TYPE="n2-standard-4"
 MAIN_NUM_NODES="2"

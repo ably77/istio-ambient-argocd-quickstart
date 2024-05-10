@@ -20,7 +20,7 @@ If you have questions, please reach out on the Solo Slack channel.
 Ready? Set? Go!
 
 ## Prerequisites
-For this exercise, we’re going to do all the work on a EKS cluster. All you’ll need to get started is CLI utilities kubectl, eksctl, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
+For this exercise, we’re going to do all the work on a EKS cluster. All you’ll need to get started is CLI utilities kubectl, eksctl, and curl. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
 
 ### Install EKS
 

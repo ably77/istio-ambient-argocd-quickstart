@@ -18,7 +18,7 @@ If you have questions, please reach out on the Solo Slack channel.
 Ready? Set? Go!
 
 ## Prerequisites
-For this exercise, we’re going to do all the work on your local workstation. All you’ll need to get started is a Docker-compatible environment such as Docker Desktop, plus the CLI utilities kubectl, k3d, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
+For this exercise, we’re going to do all the work on your local workstation. All you’ll need to get started is a Docker-compatible environment such as Docker Desktop, plus the CLI utilities kubectl, k3d, and curl. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
 
 ### Install k3d
 
