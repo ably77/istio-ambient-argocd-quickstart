@@ -24,13 +24,20 @@ For this exercise, we’re going to do all the work on a EKS cluster. All you’
 
 ### Install EKS
 
+Set AWS environment variables. You can generally access this info from the AWS console
+```bash
+export AWS_ACCESS_KEY_ID=""
+export AWS_SECRET_ACCESS_KEY=""
+export AWS_SESSION_TOKEN=""
+```
+
 Set the following variables for cluster name, region, zone, machine type, and number of nodes
 ```
 EKS_CLUSTER_NAME="eks-quickstart"
 EKS_CLUSTER_REGION="us-west-2"
 EKS_CLUSTER_ZONE="us-west-2a,us-west-2b,us-west-2c"
-MAIN_MACHINE_TYPE="n2-standard-4"
-MAIN_NUM_NODES="2"
+MAIN_MACHINE_TYPE="m5.xlarge"
+MAIN_NUM_NODES="1"
 ```
 
 Create the cluster using `eksctl`
@@ -41,11 +48,6 @@ eksctl create cluster --name ${EKS_CLUSTER_NAME} --nodes ${MAIN_NUM_NODES} --nod
 Verify that the cluster has been created
 ```bash
 kubectl config get-contexts
-```
-
-The output should look similar to below
-```bash
-
 ```
 
 ### Installing Argo CD	
@@ -361,7 +363,7 @@ kubectl delete applications -n argocd istio-base
 
 If you’d like to cleanup the work you’ve done, simply delete the EKS cluster where you’ve been working.
 ```bash
-gcloud container clusters delete ${EKS_CLUSTER_NAME} --zone ${EKS_CLUSTER_ZONE} --project ${EKS_PROJECT}
+eksctl delete cluster --name ${EKS_CLUSTER_NAME} --region ${EKS_CLUSTER_REGION} --zone ${EKS_CLUSTER_ZONE}
 ```
 
 ## Learn More

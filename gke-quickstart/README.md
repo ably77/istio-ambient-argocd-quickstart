@@ -52,11 +52,6 @@ Verify that the cluster has been created
 kubectl config get-contexts
 ```
 
-The output should look similar to below
-```bash
-
-```
-
 ### Installing Argo CD	
 Let's start by deploying Argo CD
 
@@ -353,7 +348,7 @@ curl httpbin.httpbin.svc.cluster.local:8000/get
 
 ## Follow ztunnel logs to see mTLS traffic
 ```bash
-kubectl logs -n istio-system ds/ztunnel -f
+kubectl logs -n kube-system ds/ztunnel -f
 ```
 
 You should see log output similar to below:
