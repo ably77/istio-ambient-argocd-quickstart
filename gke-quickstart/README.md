@@ -1,30 +1,50 @@
-# From Zero to Istio Ambient + Argo CD on K3D in 15 minutes!
+# From Zero to Istio Ambient + Argo CD on GKE in 15 minutes!
 
 ![15-minutes-header](../.images/15-minutes-header.png)
 *…your mileage may vary
 
 ## Introduction
-How long does it take to configure your first local development environment, sidecarless Service Mesh, and GitOps workflow?
+How long does it take to configure your first GKE development environment, sidecarless Service Mesh, and GitOps workflow?
 
-How about 15 minutes? Give us that much time and we’ll give you an ephemeral testbed to explore the benefits of the new architecture mode in Istio, deploy a few applications, and validate zero-trust with zero-effort! We’ll host all of this on a local K3D cluster to keep the setup standalone and as simple as possible.
+How about 15 minutes? Give us that much time and we’ll give you an ephemeral testbed to explore the benefits of the new architecture mode in Istio, deploy a few applications, and validate zero-trust with zero-effort! We’ll host all of this on a GKE cluster to keep the setup standalone and as simple as possible.
 
-Would you prefer to perform this exercise on a public cloud rather than a local KinD cluster? Then check out these alternative versions of this post:
+Would you prefer to perform this exercise on a platorm other than Google Cloud? Then check out these alternative versions of this post:
 
-From Zero to Istio Ambient + Argo CD on GCP in 15 minutes!
 From Zero to Istio Ambient + Argo CD on EKS in 15 minutes!
 From Zero to Istio Ambient + Argo CD on AKS in 15 minutes!
+From Zero to Istio Ambient + Argo CD on kind in 15 minutes!
+From Zero to Istio Ambient + Argo CD on k3d in 15 minutes!
+
 If you have questions, please reach out on the Solo Slack channel.
 
 Ready? Set? Go!
 
 ## Prerequisites
-For this exercise, we’re going to do all the work on your local workstation. All you’ll need to get started is a Docker-compatible environment such as Docker Desktop, plus the CLI utilities kubectl, k3d, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
+For this exercise, we’re going to do all the work on a GKE cluster. All you’ll need to get started is CLI utilities kubectl, gcloud-cli, curl, and jq. Make sure these are all available to you before jumping into the next section. I’m building this on MacOS but other platforms should be perfectly fine as well.
 
-### Install k3d
+### Install GKE
 
-To install k3d simply run the following
-```bash
-k3d cluster create
+Set the following variables for cluster name, zone, machine type, number of nodes, k8s version, and the target GKE project
+```
+GKE_CLUSTER_NAME="gke-quickstart"
+GKE_CLUSTER_ZONE="us-west4-b"
+MAIN_MACHINE_TYPE="n2-standard-4"
+MAIN_NUM_NODES="2"
+GKE_PROJECT="myproject"
+CLUSTER_VERSION="1.28.3-gke.1118000"
+```
+
+Create the cluster. Omit the `--spot` flag if you do not want to use spot instances
+```
+gcloud container clusters create ${GKE_CLUSTER_NAME} \
+  --cluster-version ${CLUSTER_VERSION} \
+  --no-enable-autoupgrade \
+  --machine-type=${MAIN_MACHINE_TYPE} \
+  --num-nodes ${MAIN_NUM_NODES} \
+  --zone ${GKE_CLUSTER_ZONE} \
+  --project ${GKE_PROJECT} \
+  --logging NONE \
+  --spot
 ```
 
 Verify that the cluster has been created
@@ -34,9 +54,7 @@ kubectl config get-contexts
 
 The output should look similar to below
 ```bash
-% kubectl config get-contexts
-CURRENT   NAME              CLUSTER           AUTHINFO                NAMESPACE
-*         k3d-k3s-default   k3d-k3s-default   admin@k3d-k3s-default   
+
 ```
 
 ### Installing Argo CD	
@@ -147,7 +165,7 @@ spec:
 EOF
 ```
 
-Deploy the `istio-cni` helm chart using Argo CD
+Deploy the `istio-cni` helm chart using Argo CD. For GKE installs, set the `cni.cniBinDir` to `/home/kubernetes/bin`
 
 ```bash
 kubectl apply -f- <<EOF
@@ -170,6 +188,9 @@ spec:
     helm:
       values: |
         profile: ambient
+        # uncomment below if using GKE
+        cni:
+          cniBinDir: /home/kubernetes/bin
   syncPolicy:
     automated:
       prune: true
@@ -212,7 +233,7 @@ spec:
 EOF
 ```
 
-Deploy the `ztunnel` helm chart using Argo CD
+Deploy the `ztunnel` helm chart using Argo CD. For GKE, ztunnel is expected to be deployed in `kube-system`
 ```bash
 kubectl apply -f- <<EOF
 apiVersion: argoproj.io/v1alpha1
@@ -225,7 +246,7 @@ metadata:
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: istio-system
+    namespace: kube-system
   project: default
   source:
     chart: ztunnel
@@ -241,7 +262,8 @@ EOF
 You can check to see that Istio Ambient architecture components have been deployed
 ```bash
 kubectl get pods -n istio-system && \
-kubectl get pods -n kube-system | grep istio-cni
+kubectl get pods -n kube-system | grep istio-cni && \
+kubectl get pods -n kube-system | grep ztunnel
 ```
 
 Output should look similar to below:
@@ -351,13 +373,13 @@ kubectl delete applications -n argocd istio-cni
 kubectl delete applications -n argocd istio-base
 ```
 
-If you’d like to cleanup the work you’ve done, simply delete the k3d cluster where you’ve been working.
+If you’d like to cleanup the work you’ve done, simply delete the GKE cluster where you’ve been working.
 ```bash
-k3d cluster delete
+gcloud container clusters delete ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GKE_PROJECT}
 ```
 
 ## Learn More
-In this blog post, we explored how you can get started with Istio Ambient and Argo CD on your own workstation. We walked step-by-step through the process of standing up a k3d cluster, configuring the new Istio Ambient architecture, installing a couple applications, and then validating zero trust for service-to-service communication without injecting sidecars! All of the code used in this guide is available on github.
+In this blog post, we explored how you can get started with Istio Ambient and Argo CD on your own workstation. We walked step-by-step through the process of standing up a GKE cluster, configuring the new Istio Ambient architecture, installing a couple applications, and then validating zero trust for service-to-service communication without injecting sidecars! All of the code used in this guide is available on github.
 
 A Gloo Mesh Core subscription offers even more value to users who require:
 
