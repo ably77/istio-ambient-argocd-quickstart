@@ -379,7 +379,7 @@ kubectl delete applications -n argocd istio-base
 
 If you’d like to cleanup the work you’ve done, simply delete the EKS cluster where you’ve been working.
 ```bash
-eksctl delete cluster --name ${EKS_CLUSTER_NAME} --region ${EKS_CLUSTER_REGION} --zone ${EKS_CLUSTER_ZONE}
+eksctl delete cluster --name ${EKS_CLUSTER_NAME} --region ${EKS_CLUSTER_REGION}
 ```
 
 ## Learn More
