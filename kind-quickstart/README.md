@@ -13,9 +13,10 @@ The main goal of this tutorial is to showcase how Istio Ambient architecture com
 
 Would you prefer to perform this exercise on a public cloud rather than a local KinD cluster? Then check out these alternative versions of this post:
 
-From Zero to Istio Ambient + Argo CD on GCP in 15 minutes!
-From Zero to Istio Ambient + Argo CD on EKS in 15 minutes!
-From Zero to Istio Ambient + Argo CD on AKS in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on GCP in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on EKS in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on AKS in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on k3d in 15 minutes!
 If you have questions, please reach out on the Solo Slack channel.
 
 Ready? Set? Go!

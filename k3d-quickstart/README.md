@@ -10,9 +10,10 @@ How about 15 minutes? Give us that much time and we’ll give you an ephemeral t
 
 Would you prefer to perform this exercise on a public cloud rather than a local KinD cluster? Then check out these alternative versions of this post:
 
-From Zero to Istio Ambient + Argo CD on GCP in 15 minutes!
-From Zero to Istio Ambient + Argo CD on EKS in 15 minutes!
-From Zero to Istio Ambient + Argo CD on AKS in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on GCP in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on EKS in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on AKS in 15 minutes!
+- From Zero to Istio Ambient + Argo CD on kind in 15 minutes!
 If you have questions, please reach out on the Solo Slack channel.
 
 Ready? Set? Go!
