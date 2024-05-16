@@ -101,7 +101,7 @@ kubectl port-forward svc/argocd-server -n argocd 9999:443
 ## Installing Istio Ambient
 Set the Istio version in an environment variable
 ```bash
-export ISTIO_VERSION=1.22.0-rc.0
+export ISTIO_VERSION=1.22.0
 ```
 
 Reminder if you want a specific version of Istio or to use the officially supported images provided by Solo.io, get the Hub value from the [Solo support page for Istio Solo images](https://support.solo.io/hc/en-us/articles/4414409064596). The value is present within the `Solo.io Istio Versioning Repo key` section
