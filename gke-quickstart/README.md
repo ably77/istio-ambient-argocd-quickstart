@@ -34,9 +34,9 @@ Set the following variables for cluster name, zone, machine type, number of node
 GKE_CLUSTER_NAME="gke-ambient-quickstart"
 GKE_CLUSTER_ZONE="us-west4-b"
 MAIN_MACHINE_TYPE="n2-standard-4"
-MAIN_NUM_NODES="2"
+MAIN_NUM_NODES="1"
 GKE_PROJECT="myproject"
-CLUSTER_VERSION="1.28.3-gke.1118000"
+CLUSTER_VERSION="1.29.1-gke.1589020"
 ```
 
 Create the cluster. Omit the `--spot` flag if you do not want to use spot instances
